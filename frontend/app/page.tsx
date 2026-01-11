@@ -46,7 +46,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             🍺 Bar Management
           </h1>
-          <p className="text-gray-600">Gérez votre bar comme un pro</p>
+          <p className="text-gray-600">Gérez votre bar comme un pro !99!</p>
         </div>
 
         <Card>
@@ -55,7 +55,7 @@ export default function Home() {
             <Alert
               type="error"
               message={error}
-              onClose={() => setError('')}
+              onClose={() => setError("")}
               className="mb-4"
             />
           )}

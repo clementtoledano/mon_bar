@@ -58,11 +58,18 @@ docker-compose up -d --build
 ```
 
 ### 🔥 Hot Reload
-Le hot reload est activé automatiquement !
-- Modifiez un fichier frontend ou backend
-- Les changements sont détectés automatiquement
-- Le navigateur se rafraîchit tout seul
+
+**Backend** : ✅ Fonctionne automatiquement avec nodemon
+- Modifiez un fichier `.ts` dans le backend
+- Le serveur redémarre automatiquement (2-3 secondes)
+
+**Frontend** : ⚠️ Recompilation automatique mais refresh manuel
+- Modifiez un fichier `.tsx`, `.ts`, `.css`
+- Next.js recompile automatiquement (2-3 secondes)
+- **Rafraîchissez manuellement votre navigateur** (`F5` ou `Ctrl+R`)
 - Pas besoin de redémarrer les conteneurs
+
+> **Note**: Sur Windows avec Docker, le WebSocket HMR de Next.js ne fonctionne pas toujours. Les fichiers sont bien recompilés mais le navigateur ne se rafraîchit pas automatiquement. Un simple `F5` suffit pour voir les changements.
 
 ### Base de données
 ```bash
