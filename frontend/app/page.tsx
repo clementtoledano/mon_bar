@@ -46,7 +46,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             🍺 Bar Management
           </h1>
-          <p className="text-gray-600">Gérez votre bar comme un pro !99!</p>
+          <p className="text-gray-600">Gérez votre bar comme un pro !6ppp!</p>
         </div>
 
         <Card>
