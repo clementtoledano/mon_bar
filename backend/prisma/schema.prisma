@@ -1,0 +1,210 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  username      String    @unique
+  password_hash String
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  bars          Bar[]
+
+  @@map("users")
+}
+
+// Bar model - the main establishment
+model Bar {
+  id               String     @id @default(uuid())
+  name             String
+  owner_id         String
+  owner            User       @relation(fields: [owner_id], references: [id])
+  cash             Float      @default(10000) // Starting cash
+  reputation_score Float      @default(50) // 0-100
+  opened_at        DateTime   @default(now())
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+
+  // Relations
+  products         Product[]
+  inventory        Inventory[]
+  employees        Employee[]
+  transactions     Transaction[]
+  suppliers        BarSupplier[]
+  events           BarEvent[]
+
+  @@map("bars")
+}
+
+// Product model - drinks and items
+model Product {
+  id               String      @id @default(uuid())
+  name             String
+  category         String      // beer, wine, spirit, soft, food
+  subcategory      String?     // lager, pale_ale, vodka, etc.
+  brand            String?
+  volume_ml        Int?        // for drinks
+  base_cost        Float       // base purchase cost
+  selling_price    Float       // current selling price
+  is_active        Boolean     @default(true)
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  // Relations
+  bars             Bar[]
+  inventory        Inventory[]
+  transactions     Transaction[]
+  supplier_products SupplierProduct[]
+
+  @@map("products")
+}
+
+// Inventory tracking
+model Inventory {
+  id               String    @id @default(uuid())
+  bar_id           String
+  bar              Bar       @relation(fields: [bar_id], references: [id])
+  product_id       String
+  product          Product   @relation(fields: [product_id], references: [id])
+  quantity         Int       @default(0)
+  min_stock_alert  Int       @default(10)
+  last_restock     DateTime?
+  updated_at       DateTime  @updatedAt
+
+  @@unique([bar_id, product_id])
+  @@map("inventory")
+}
+
+// Suppliers
+model Supplier {
+  id                String            @id @default(uuid())
+  name              String
+  delivery_time_min Int               // in hours
+  delivery_time_max Int               // in hours
+  reliability_score Float             @default(80) // 0-100
+  created_at        DateTime          @default(now())
+
+  // Relations
+  bars              BarSupplier[]
+  products          SupplierProduct[]
+  orders            Order[]
+
+  @@map("suppliers")
+}
+
+// Many-to-many: Bar <-> Supplier
+model BarSupplier {
+  bar_id      String
+  bar         Bar       @relation(fields: [bar_id], references: [id])
+  supplier_id String
+  supplier    Supplier  @relation(fields: [supplier_id], references: [id])
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now())
+
+  @@id([bar_id, supplier_id])
+  @@map("bar_suppliers")
+}
+
+// Supplier products with pricing
+model SupplierProduct {
+  id          String    @id @default(uuid())
+  supplier_id String
+  supplier    Supplier  @relation(fields: [supplier_id], references: [id])
+  product_id  String
+  product     Product   @relation(fields: [product_id], references: [id])
+  unit_price  Float
+  min_quantity Int      @default(1)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@unique([supplier_id, product_id])
+  @@map("supplier_products")
+}
+
+// Orders from suppliers
+model Order {
+  id              String      @id @default(uuid())
+  bar_id          String
+  supplier_id     String
+  supplier        Supplier    @relation(fields: [supplier_id], references: [id])
+  status          String      // pending, in_transit, delivered, cancelled
+  total_cost      Float
+  ordered_at      DateTime    @default(now())
+  expected_delivery DateTime?
+  delivered_at    DateTime?
+
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+// Order items
+model OrderItem {
+  id         String   @id @default(uuid())
+  order_id   String
+  order      Order    @relation(fields: [order_id], references: [id])
+  product_id String
+  quantity   Int
+  unit_price Float
+  subtotal   Float
+
+  @@map("order_items")
+}
+
+// Employees
+model Employee {
+  id         String   @id @default(uuid())
+  bar_id     String
+  bar        Bar      @relation(fields: [bar_id], references: [id])
+  name       String
+  role       String   // bartender, waiter, manager
+  hourly_wage Float
+  efficiency Float    @default(80) // 0-100
+  hired_at   DateTime @default(now())
+  is_active  Boolean  @default(true)
+
+  @@map("employees")
+}
+
+// Transactions (sales history)
+model Transaction {
+  id              String   @id @default(uuid())
+  bar_id          String
+  bar             Bar      @relation(fields: [bar_id], references: [id])
+  product_id      String?
+  product         Product? @relation(fields: [product_id], references: [id])
+  transaction_type String  // sale, expense, order
+  amount          Float
+  quantity        Int?
+  customer_group  String?  // young_adults, professionals, etc.
+  occurred_at     DateTime @default(now())
+
+  @@index([bar_id, occurred_at])
+  @@map("transactions")
+}
+
+// Events (weather, holidays, etc.)
+model BarEvent {
+  id           String   @id @default(uuid())
+  bar_id       String?
+  bar          Bar?     @relation(fields: [bar_id], references: [id])
+  event_type   String   // weather, holiday, special
+  name         String
+  description  String?
+  impact_multiplier Float @default(1.0)
+  start_time   DateTime
+  end_time     DateTime?
+  created_at   DateTime @default(now())
+
+  @@map("bar_events")
+}
