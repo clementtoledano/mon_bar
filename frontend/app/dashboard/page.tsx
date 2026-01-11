@@ -1,19 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { Button, Card } from '@/components/ui';
 
 export default function Dashboard() {
   const router = useRouter();
-  const { user, isLoading, isAuthenticated, logout } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Vérifier l'authentification
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    } else {
       router.push('/');
     }
-  }, [isLoading, isAuthenticated, router]);
+    setIsLoading(false);
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    router.push('/');
+  };
 
   if (isLoading) {
     return (
@@ -26,7 +36,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -41,10 +51,10 @@ export default function Dashboard() {
                 🍺 Bar Management
               </h1>
               <p className="text-sm text-gray-600">
-                Bienvenue, {user.username} !
+                Bienvenue !
               </p>
             </div>
-            <Button variant="secondary" onClick={logout}>
+            <Button variant="secondary" onClick={handleLogout}>
               Déconnexion
             </Button>
           </div>
@@ -130,20 +140,16 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        {/* User Info */}
-        <Card title="Informations du compte" padding="lg" className="mt-6">
+        {/* Info */}
+        <Card title="Informations" padding="lg" className="mt-6">
           <div className="space-y-2">
             <div>
-              <span className="font-medium text-gray-700">Email:</span>{' '}
-              <span className="text-gray-600">{user.email}</span>
+              <span className="font-medium text-gray-700">Session:</span>{' '}
+              <span className="text-gray-600">Active</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Username:</span>{' '}
-              <span className="text-gray-600">{user.username}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-700">ID:</span>{' '}
-              <span className="text-gray-600 text-xs">{user.id}</span>
+              <span className="font-medium text-gray-700">Mode:</span>{' '}
+              <span className="text-gray-600">Gestion</span>
             </div>
           </div>
         </Card>
