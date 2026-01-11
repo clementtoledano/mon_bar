@@ -32,27 +32,13 @@ Ouvrez votre navigateur sur : **http://localhost:3000**
 
 ### 2. Se connecter
 
-#### Option 1 : Mot de passe journalier (pour n'importe quel compte)
-- Email : `test@bar.com`
-- Mot de passe : `11012026` (format: JJMMAAAA - aujourd'hui)
+**Authentification simplifiée - Un seul mot de passe :**
+- Mot de passe : `11012026` (format: JJMMAAAA - la date du jour)
 
-#### Option 2 : Mot de passe classique
-- Email : `test@bar.com`
-- Mot de passe : `password123`
-
-#### Option 3 : Créer un nouveau compte
-1. Cliquez sur l'onglet "Inscription"
-2. Remplissez les champs
-3. Créez votre compte
-
-### 3. Tester le mot de passe journalier
-
-Le système accepte toujours le mot de passe du jour au format **JJMMAAAA** :
+Le mot de passe change automatiquement chaque jour :
 - Aujourd'hui (11 janvier 2026) : `11012026`
 - Demain : `12012026`
-- Etc.
-
-Ce mot de passe fonctionne pour **tous les comptes** existants !
+- Format : Jour (2 chiffres) + Mois (2 chiffres) + Année (4 chiffres)
 
 ## 🔧 Commandes utiles
 
@@ -70,6 +56,13 @@ docker-compose down
 # Rebuild complet
 docker-compose up -d --build
 ```
+
+### 🔥 Hot Reload
+Le hot reload est activé automatiquement !
+- Modifiez un fichier frontend ou backend
+- Les changements sont détectés automatiquement
+- Le navigateur se rafraîchit tout seul
+- Pas besoin de redémarrer les conteneurs
 
 ### Base de données
 ```bash
