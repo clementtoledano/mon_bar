@@ -1,135 +1,152 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { Button, Card } from '@/components/ui';
 
 export default function Dashboard() {
-  const [isConnected, setIsConnected] = useState(false);
+  const router = useRouter();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
-    // TODO: Connect to Socket.io
-    setIsConnected(false);
-  }, []);
+    if (!isLoading && !isAuthenticated) {
+      router.push('/');
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              🍺 Mon Bar
-            </h1>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    isConnected ? 'bg-green-500' : 'bg-red-500'
-                  }`}
-                />
-                <span className="text-sm text-gray-600">
-                  {isConnected ? 'Connecté' : 'Déconnecté'}
-                </span>
-              </div>
-              <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
-                Accueil
-              </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                🍺 Bar Management
+              </h1>
+              <p className="text-sm text-gray-600">
+                Bienvenue, {user.username} !
+              </p>
             </div>
+            <Button variant="secondary" onClick={logout}>
+              Déconnexion
+            </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">
-              Trésorerie
-            </h3>
-            <p className="text-2xl font-bold text-gray-900">10 000 €</p>
-            <p className="text-xs text-green-600 mt-1">+5% aujourd'hui</p>
-          </div>
-          <div className="card">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">CA du jour</h3>
-            <p className="text-2xl font-bold text-gray-900">0 €</p>
-            <p className="text-xs text-gray-500 mt-1">Bar fermé</p>
-          </div>
-          <div className="card">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">
-              Clients servis
-            </h3>
-            <p className="text-2xl font-bold text-gray-900">0</p>
-            <p className="text-xs text-gray-500 mt-1">Bar fermé</p>
-          </div>
-          <div className="card">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">
-              Satisfaction
-            </h3>
-            <p className="text-2xl font-bold text-gray-900">50%</p>
-            <p className="text-xs text-gray-500 mt-1">Moyenne</p>
-          </div>
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Dashboard
+          </h2>
+          <p className="text-gray-600">
+            Vue d'ensemble de votre activité
+          </p>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
-              <button className="px-6 py-3 text-sm font-medium text-primary-600 border-b-2 border-primary-600">
-                📊 Ventes
-              </button>
-              <button className="px-6 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">
-                📦 Stocks
-              </button>
-              <button className="px-6 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">
-                💰 Finance
-              </button>
-            </nav>
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-6">
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">
-                Tableau de bord en construction
-              </p>
-              <p className="text-sm text-gray-400">
-                Les données en temps réel seront affichées ici
-              </p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card padding="md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Trésorerie
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  10,000 €
+                </p>
+              </div>
+              <div className="text-3xl">💰</div>
             </div>
-          </div>
+          </Card>
+
+          <Card padding="md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Réputation
+                </p>
+                <p className="text-2xl font-bold text-gray-900">50/100</p>
+              </div>
+              <div className="text-3xl">⭐</div>
+            </div>
+          </Card>
+
+          <Card padding="md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Clients aujourd'hui
+                </p>
+                <p className="text-2xl font-bold text-gray-900">0</p>
+              </div>
+              <div className="text-3xl">👥</div>
+            </div>
+          </Card>
+
+          <Card padding="md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  CA du jour
+                </p>
+                <p className="text-2xl font-bold text-gray-900">0 €</p>
+              </div>
+              <div className="text-3xl">📊</div>
+            </div>
+          </Card>
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card">
-            <h3 className="font-semibold mb-2">📦 Commander des stocks</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Passez commande auprès de vos fournisseurs
-            </p>
-            <button className="btn-primary w-full" disabled>
-              Prochainement
-            </button>
+        <Card title="Actions rapides" padding="lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button variant="primary" className="w-full">
+              📦 Gérer les stocks
+            </Button>
+            <Button variant="primary" className="w-full">
+              👥 Gérer le personnel
+            </Button>
+            <Button variant="primary" className="w-full">
+              📊 Voir les statistiques
+            </Button>
           </div>
-          <div className="card">
-            <h3 className="font-semibold mb-2">💵 Ajuster les prix</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Optimisez vos marges produit par produit
-            </p>
-            <button className="btn-primary w-full" disabled>
-              Prochainement
-            </button>
+        </Card>
+
+        {/* User Info */}
+        <Card title="Informations du compte" padding="lg" className="mt-6">
+          <div className="space-y-2">
+            <div>
+              <span className="font-medium text-gray-700">Email:</span>{' '}
+              <span className="text-gray-600">{user.email}</span>
+            </div>
+            <div>
+              <span className="font-medium text-gray-700">Username:</span>{' '}
+              <span className="text-gray-600">{user.username}</span>
+            </div>
+            <div>
+              <span className="font-medium text-gray-700">ID:</span>{' '}
+              <span className="text-gray-600 text-xs">{user.id}</span>
+            </div>
           </div>
-          <div className="card">
-            <h3 className="font-semibold mb-2">👥 Gérer les employés</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Recrutez et organisez votre équipe
-            </p>
-            <button className="btn-primary w-full" disabled>
-              Prochainement
-            </button>
-          </div>
-        </div>
+        </Card>
       </main>
     </div>
   );

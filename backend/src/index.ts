@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +35,9 @@ app.get('/api', (_req: Request, res: Response) => {
     status: 'running',
   });
 });
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Socket.io connection
 io.on('connection', (socket) => {
