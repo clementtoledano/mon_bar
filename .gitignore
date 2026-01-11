@@ -40,12 +40,29 @@ logs/
 *.sqlite
 *.sqlite3
 
-# Prisma
-prisma/migrations/
-
 # Docker
 docker-compose.override.yml
+.dockerignore
 
 # Misc
 .cache/
 *.tsbuildinfo
+.turbo/
+
+# OS specific
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.claude/settings.local.json
+
+# Next.js specific
+.next/
+out/
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
